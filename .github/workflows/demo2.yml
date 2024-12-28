@@ -9,8 +9,13 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm # path to npm cache
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }} # used to retrieve cache in the future, the hashFiles function generates a unique name and changes whenever the file contents changes, we'll use the package-lock.json file because whenever it changes due to a dependency change this is a good file to pick up on that change. When the hash key updates then the previous cache will be discarded and a new one created. Will look at the folder after the job finishes and update the cache at that point
       - name: Install dependencies
-        run: npm ci
+        run: npm ci # automatically uses the ~./.npm file, if it exists it will be used, if it doesn't exist it will be redownloaded
       - name: Lint code
         run: npm run lint
       - name: Test code
@@ -23,8 +28,13 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm # path to npm cache
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }} # used to retrieve cache in the future, the hashFiles function generates a unique name and changes whenever the file contents changes, we'll use the package-lock.json file because whenever it changes due to a dependency change this is a good file to pick up on that change. When the hash key updates then the previous cache will be discarded and a new one created. Will look at the folder after the job finishes and update the cache at that point
       - name: Install dependencies
-        run: npm ci
+        run: npm ci # automatically uses the ~./.npm file, if it exists it will be used, if it doesn't exist it will be redownloaded
       - name: Build
         run: npm run build
       - name: Publish JS filename
