@@ -18,6 +18,8 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
+    outputs: # define simple outputs that can be defined here and used in other jobs later
+      script-file: ${{ steps.publish.outputs.script-file }} # uses the "steps" context to access the step where the below file is output via the step id
     steps:
       - name: Get code
         uses: actions/checkout@v3
@@ -25,6 +27,9 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Publish JS filename
+        id: publish # step id
+        run: find dist/assets/*.js -type f -execdir echo 'script-file={}' >> $GITHUB_OUTPUT ';' # takes the output key/value pair and write it to the $GITHUB_OUTPUT file (managed by GitHub)
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -43,5 +48,7 @@ jobs:
           name: dist-files
       - name: Output contents
         run: ls
+      - name: Output filename
+        run echo "${{ needs.build.outputs.script-file }}" # uses the "needs" context
       - name: Deploy
         run: echo "Deploying..."
